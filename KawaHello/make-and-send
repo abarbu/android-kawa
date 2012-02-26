@@ -1,0 +1,2 @@
+adb shell kill $(adb shell ps|grep -i kawa.android|awk  '{ print $2 }')
+ant debug && adb install -r bin/KawaHello-debug.apk && adb shell am start -a android.intent.action.MAIN kawa.android/.hello

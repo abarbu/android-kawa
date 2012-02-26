@@ -1,0 +1,3 @@
+adb shell kill $(adb shell ps|grep -i com.zeroxab.learningandroid|awk  '{ print $2 }')
+ant debug && adb install -r bin/LearningAndroid-debug.apk && adb shell am start -a android.intent.action.MAIN com.zeroxab.learningandroid.yamba/.TimelineActivity
+# StatusActivity

@@ -1,0 +1,1 @@
+emulator -avd Test -no-boot-anim -qemu -sdl

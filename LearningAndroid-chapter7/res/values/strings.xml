@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">LearningAndroid</string>
+  <string name="titleYamba">LearningAndroid</string>
+
+  <string name="hintText">Please enter your 140-character status</string>
+  <string name="buttonUpdate">Update</string>
+
+  <string name="titleStatus">Status Update</string>
+  <string name="titlePrefs">Prefs</string>
+  <string name="titleUsername">Username</string>
+  <string name="titlePassword">Password</string>
+  <string name="titleApiRoot">API Root</string>
+
+  <string name="summaryUsername">Enter your username</string>
+  <string name="summaryPassword">Enter your password</string>
+  <string name="summaryApiRoot">URL of Root API</string>
+</resources>

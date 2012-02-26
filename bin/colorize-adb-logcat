@@ -1,0 +1,12 @@
+#!/bin/bash
+
+adb logcat |  \
+perl -p -e '$|=1; s/^.\/NetworkStats\(.*//g' | \
+perl -p -e '$|=1; s/^V\//\e[01;30m/g'   | # dark grey \
+perl -p -e '$|=1; s/^I\//\e[00;32m/g'   | # dark green \
+perl -p -e '$|=1; s/^D\//\e[00;37m/g'   | # white \
+perl -p -e '$|=1; s/^W\//\e[01;31m/g'   | # dark red \
+perl -p -e '$|=1; s/^E\//\e[00;41m/g'   | # red \
+perl -p -e '$|=1; s/^F\//\e[00;41m/g'   | # red \
+perl -p -e '$|=1; s/^(.*?)\( *(.*?)\): +/\1,\2,/g' | \
+awk -F, '{ printf "%30s %5s %s\033[00;37m\n", $1, $2, $3}'

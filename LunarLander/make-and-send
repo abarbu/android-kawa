@@ -1,0 +1,2 @@
+adb shell kill $(adb shell ps|grep -i com.zeroxab.lunarlander|awk  '{ print $2 }')
+ant debug && adb install -r bin/LunarLander-debug.apk && adb shell am start -a android.intent.action.MAIN com.zeroxab.lunarlander/.LunarLander

@@ -1,0 +1,7 @@
+android create project --target $ANDROID_PLATFORM --name KawaHello --activity hello --path KawaHello --package kawa.android
+cd KawaHello
+rm KawaHello/src/kawa/android/hello.jar
+touch KawaHello/src/kawa/android/hello.scm
+ln -s kawa/kawa-1.11.jar KawaHello/libs/kawa.jar
+(cd KawaHello; patch < ../build-xml.patch)
+
