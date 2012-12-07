@@ -83,7 +83,7 @@ in order to avoid having your file be overridden by tools such as "android updat
   <import file="${sdk.dir}/tools/ant/build.xml" />
 
   <target name="-dex" depends="-compile,scompile">
-    <dex-helper />
+      <dex-helper nolocals="true"/>
   </target>
 
   <property name="out.classes.dir" value="${out.dir}/classes" />

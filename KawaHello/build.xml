@@ -83,7 +83,7 @@
     <import file="${sdk.dir}/tools/ant/build.xml" />
 
     <target name="-dex" depends="-compile,scompile">
-      <dex-helper />
+      <dex-helper nolocals="true"/>
     </target>
 
     <!-- Compile this project's .scm files into .class files. -->

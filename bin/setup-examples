@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ ! -d kawa ]; then
+   echo "Error: Kawa should exist in the kawa/ directory as set up by bin/setup-kawa."
+   exit 1;
+fi
+
+ln -s `pwd`/kawa/kawa-1.*.jar KawaHello/libs/kawa.jar
+ln -s `pwd`/kawa/kawa-1.*.jar LearningAndroid-chapter10/libs/kawa.jar
+ln -s `pwd`/kawa/kawa-1.*.jar LearningAndroid-chapter6/libs/kawa.jar
+ln -s `pwd`/kawa/kawa-1.*.jar LearningAndroid-chapter7/libs/kawa.jar
+ln -s `pwd`/kawa/kawa-1.*.jar LearningAndroid-chapter8/libs/kawa.jar
+ln -s `pwd`/kawa/kawa-1.*.jar LearningAndroid-chapter9/libs/kawa.jar
+ln -s `pwd`/kawa/kawa-1.*.jar LunarLander/libs/kawa.jar

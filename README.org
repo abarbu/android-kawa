@@ -7,33 +7,37 @@
   Android"
 
 These were written while I was figuring out if Kawa can be used for
-Android development, and how one might do so as there are few examples
-of this and many Android&Kawa-specific quirks to figure out. All
-examples try to mostly stay true to their source however badly
-designed that source was. As such this isn't a good place to look for
-good Scheme style or idiomatic Kawa.
+Android development and how to work out various Android&Kawa-specific
+quirks. All examples try to mostly stay true to their source however
+badly designed that source was. As such this isn't a good place to
+look for good Scheme style or idiomatic Kawa.
 
-To get started you'll need a custom build for Kawa:
+To get started you'll need a custom build for Kawa, this will fetch
+the latest svn sources
 #+BEGIN_SRC sh
-svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
-./configure --with-android=$ANDROID_HOME/platforms/$ANDROID_PLATFORM/android.jar --disable-xquery --disable-jemacs
+bin/setup-kawa
 #+END_SRC
-and you will need to place kawa-1.11.jar in the libs/ directory in for each of the examples.
+and to get the examples to work you need to set them up
+#+BEGIN_SRC sh
+bin/setup-examples
+#+END_SRC
 
 To create a new project you can use:
 #+BEGIN_SRC sh
-android create project --target $ANDROID_PLATFORM --name $PROJECT --activity $ACTIVITY --path $PROJECT --package kawa.android
-cd $PROJECT
-rm $PROJECT/src/kawa/android/$ACTIVITY.jar
-touch $PROJECT/src/kawa/android/$ACTIVITY.scm
-ln -s $KAWA_INSTALL_DIR/kawa-1.11.jar $PROJECT/libs/kawa.jar
-(cd $PROJECT; patch < ../build-xml.patch)
+bin/make-project android-14 HelloWorld hello
 #+END_SRC
+the arguments are: the platform/api level, the project name and the
+original activity name. This calls 'android create project' and
+patches the resulting build.xml file. It will create a trivial
+application that displays a message. Sources are in
+<project-name>/src/kawa/android/<activity>.scm.
+
+The resulting directory contains a make-and-send script which builds
+the project, uploads it to the emulator or to the phone and starts it
+up.
 
 You may need to update local.properties in each of the examples
 directory to change the path to the SDK.
-
-Each directory contains a simple make-and-send script which builds the project, uploads it to the emulator and starts it up.
 
 This has been tested with Android SDK r15.
 

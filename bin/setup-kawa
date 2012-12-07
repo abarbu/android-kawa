@@ -1,0 +1,19 @@
+#!/bin/bash
+
+EXPECTED_ARGS=2
+E_BADARGS=65
+
+if [ $# -lt $EXPECTED_ARGS ]
+then
+  echo "Usage: `basename $0` android-home android-platform"
+  echo "	Setup a Kawa install in the current directory for a particular Android version."
+  echo "	for example: bin/setup-kawa /opt/android-sdk-update-manager android-14"
+  exit $E_BADARGS
+fi
+
+svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
+cd kawa
+./configure --with-android=$ANDROID_HOME/platforms/$ANDROID_PLATFORM/android.jar --disable-xquery --disable-jemacs
+# Because kawa docs sometimes fail to build.
+echo '' > doc/kawa.texi
+make

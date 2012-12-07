@@ -1,7 +1,80 @@
-android create project --target $ANDROID_PLATFORM --name KawaHello --activity hello --path KawaHello --package kawa.android
-cd KawaHello
-rm KawaHello/src/kawa/android/hello.jar
-touch KawaHello/src/kawa/android/hello.scm
-ln -s kawa/kawa-1.11.jar KawaHello/libs/kawa.jar
-(cd KawaHello; patch < ../build-xml.patch)
+#!/bin/bash
 
+EXPECTED_ARGS=3
+E_BADARGS=65
+
+if [ $# -lt $EXPECTED_ARGS ]
+then
+  echo "Usage: `basename $0` android-platform project-name activity"
+  echo "Setups a new Android project with Kawa."
+  echo "	Kawa should exist in the kawa/ directory as set up by bin/setup-kawa"
+  echo "	bin/make-project android-14 KawaHello2 hello"
+  exit $E_BADARGS
+fi
+
+if [ ! -d kawa ]; then
+   echo "Error: Kawa should exist in the kawa/ directory as set up by bin/setup-kawa."
+   exit 1;
+fi
+
+if [ -d $2 ]; then
+   echo "Error: $2 already exists. You can't create a new project into an existing directory."
+   exit 1;
+fi
+
+android create project --target $1 --name $2 --activity $3 --path $2 --package kawa.android
+rm -f $2/src/kawa/android/$3.jar
+touch $2/src/kawa/android/$3.scm
+ln -s `pwd`/kawa/kawa-1.*.jar $2/libs/kawa.jar
+
+cat > $2/build.xml.patch <<EOF
+--- build.xml.orig	2010-10-11 15:48:59.092681778 -0700
++++ build.xml	2010-11-04 22:26:34.565673740 -0700
+@@ -64,4 +64,27 @@
+     -->
+     <setup />
+ 
++    <target name="-dex" depends="-compile,scompile">
++      <dex-helper nolocals="true"/>
++    </target>
++
++    <!-- Compile this project's .scm files into .class files. -->
++    <target name="scompile" depends="-code-gen">
++      <java failonerror="true" fork="true" classname="kawa.repl">
++	<classpath>
++	  <pathelement path="libs/kawa.jar"/>
++	  <pathelement path="\${sdk.dir}/platforms/\${target}/android.jar"/>
++          <pathelement path="\${out.classes.absolute.dir}"/>
++	</classpath>
++       <arg value="-d"/> <arg path="\${out.classes.absolute.dir}"/>
++       <arg line="-P kawa.android. --warn-undefined-variable --module-static-run --warn-invoke-unknown-method --warn-as-error"/>
++       <arg value="-C"/>
++       <arg file="src/kawa/android/$3.scm"/>
++<!--       <fileset dir=".">
++         <include name="**/*.scm"/>
++       </fileset>
++-->
++      </java>
++    </target>
++
+ </project>
+EOF
+
+(cd $2; patch < build.xml.patch)
+echo 'adb shell kill $(adb shell ps|grep -i kawa.android|awk  '"'"'{ print $2 }'"') > /dev/null" > $2/make-and-send
+echo "ant debug && adb install -r bin/$2-debug.apk && adb shell am start -a android.intent.action.MAIN kawa.android/.$3" >> $2/make-and-send
+
+cat > $2/src/kawa/android/$3.scm <<EOF
+(require 'android-defs)
+
+(define-namespace Log "class:android.util.Log")
+
+(activity $3
+  (on-create-view
+   (Log:i "kawa" "Just letting you know we're alive.")
+   (android.widget.TextView
+    (this)
+    text: "Hello from Kawa Scheme!")))
+EOF
+
+echo "Done! Use \"cd $2 && ./make-and-send\" to see it action. Sources are in kawa/android/$3.scm"
