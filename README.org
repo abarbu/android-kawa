@@ -12,36 +12,118 @@ quirks. All examples try to mostly stay true to their source however
 badly designed that source was. As such this isn't a good place to
 look for good Scheme style or idiomatic Kawa.
 
-To get started you'll need a custom build for Kawa, this will fetch
-the latest svn sources
+** Setting up
+
+We'll first need to get an Android SDK set up, skip this if you've
+already got one. You'll need to install the Android SDK; your
+distribution's package management software will help with this. Once
+you're done, run ''android'', select and install the latest API
+revision (17 as of this document).
+
+You will need Java 1.6, dex is unhappy with 1.7. Running
 #+BEGIN_SRC sh
-bin/setup-kawa
+javac -version
 #+END_SRC
-and to get the examples to work you need to set them up
+should yield something that starts with 1.6, if not you're going to
+have to use your distribution's package manager to switch to Java 1.6.
+
+To get started with Scheme you'll need a custom build for Kawa, this
+will fetch and build the latest sources
+#+BEGIN_SRC sh
+bin/setup-kawa <android-home> <android-platform>
+#+END_SRC
+You'll need to point it to your android SDK directory and give it the
+platform number. On my machine this looks like:
+#+BEGIN_SRC sh
+bin/setup-kawa /opt/android-sdk-update-manager android-17
+#+END_SRC
+
+** Creating a new project
+To create a new project you can use
+#+BEGIN_SRC sh
+bin/make-project <android-platform> <project-name> <activity-name>
+#+END_SRC
+for example
+#+BEGIN_SRC sh
+bin/make-project android-17 HelloWorld hello
+#+END_SRC
+The arguments are: the platform/api level, the project name and the
+original activity name. This calls 'android create project' and
+patches the resulting build.xml file. It will create a trivial
+application that displays a message. Sources are in
+<project-name>/src/kawa/android/<activity>.scm. The resulting
+application will have package name kawa.android. You should probably
+change this, It's recorded in src/kawa/android/hello.java,
+AndroidManifest.xml, and build.xml. One day I'll have make-project do
+this automatically.
+
+Before we can run anything you'll need to either connect a phone with
+developer mode enabled or set up an emulator. We can do the latter
+with
+#+BEGIN_SRC sh
+android create avd -a -n Test -t 1 --abi armeabi-v7a
+#+END_SRC
+and just accept the defaults. If you've got a plain-vanilla SDK setup
+id 1 will be the basic android platform. You can check with ''android
+list targets'' and adjust accordingly. Once it's setup it, just run
+#+BEGIN_SRC sh
+bin/start-emulator
+#+END_SRC
+to fire it up, it'll take a while...  The emulator is so obscenely
+slow that you'll want to either run things on your phone or set up
+vmware.
+
+Once the emulator is up and running lets take our new project out for
+a spin
+#+BEGIN_SRC sh
+cd HelloWorld && ./make-and-send
+#+END_SRC
+This will create an apk and send it out to either an emulator that
+we're already running or to a phone we've connected. When you modify
+the code just rerun make-and-send.
+
+** Setting up the examples
+
+To get the examples to work you need to set them up
 #+BEGIN_SRC sh
 bin/setup-examples
 #+END_SRC
 
-To create a new project you can use:
-#+BEGIN_SRC sh
-bin/make-project android-14 HelloWorld hello
-#+END_SRC
-the arguments are: the platform/api level, the project name and the
-original activity name. This calls 'android create project' and
-patches the resulting build.xml file. It will create a trivial
-application that displays a message. Sources are in
-<project-name>/src/kawa/android/<activity>.scm.
-
-The resulting directory contains a make-and-send script which builds
-the project, uploads it to the emulator or to the phone and starts it
-up.
-
 You may need to update local.properties in each of the examples
-directory to change the path to the SDK.
+directory to change the path to the Android SDK.
 
-This has been tested with Android SDK r15.
+This has been tested with Android SDK r15 and r17.
 
 LearningAndroid examples need to a copy of jtwitter.jar and
 signpost-core-1.2.1.1.jar from
 http://www.winterwell.com/software/jtwitter.php in each of their libs
 directory.
+
+** Misc
+
+While debugging I have 
+#+BEGIN_SRC sh
+bin/colorize-adb-logcat
+#+END_SRC
+running in a terminal to easily spot log messages.
+
+** Troubleshooting
+*** bad magic bits with dex
+You've somehow managed to install with 1.7. Delete your old install
+entirely, downgrade to 1.6 and reinstall.
+*** make-and-send fails
+If you see
+#+BEGIN_SRC
+INSTALL_PARSE_FAILED_INCONSISTENT_CERTIFICATES
+#+END_SRC
+after running make-and-send, you've got a copy of apk you're trying to
+send to the phone already installed but it was compiled on a different
+machine with a different certificate. You just have to uninstall
+it. Keep in mind that if you've never changed the name of a project
+you've left the default (kxawa.android) in. You'll want to uninstall
+the old package with
+#+BEGIN_SRC
+adb uninstall kawa.android
+#+END_SRC
+and read the section above on creating projects for how to change the
+internal project name.

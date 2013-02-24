@@ -1,19 +1,37 @@
 #!/bin/bash
 
+set -e
+
 EXPECTED_ARGS=2
 E_BADARGS=65
 
-if [ $# -lt $EXPECTED_ARGS ]
-then
-  echo "Usage: `basename $0` android-home android-platform"
-  echo "	Setup a Kawa install in the current directory for a particular Android version."
-  echo "	for example: bin/setup-kawa /opt/android-sdk-update-manager android-14"
-  exit $E_BADARGS
+KAWA_VERSION=1.13
+
+if [ $# -lt $EXPECTED_ARGS ]; then
+    echo "Usage: `basename $0` android-home android-platform"
+    echo "	Setup a Kawa install in the current directory for a particular Android version."
+    echo "	for example: bin/setup-kawa /opt/android-sdk-update-manager android-14"
+    exit $E_BADARGS
 fi
 
-svn -q checkout svn://sourceware.org/svn/kawa/trunk kawa
+if [[ -z $(javac -version 2>&1 | grep 1.6) ]]; then
+    echo "Your javac is not version 1.6.*"
+    echo "   dex can't process files from any other version, you'll need to downgrade"
+    exit
+fi
+
+echo "Fetching Kawa ${KAWA_VERSION}"
+if [ -e kawa ]; then
+    rm -r kawa
+fi
+if [ ! -e kawa-${KAWA_VERSION}.tar.gz ]; then
+    wget ftp://ftp.gnu.org/pub/gnu/kawa/kawa-1.13.tar.gz
+fi
+tar xvf kawa-1.13.tar.gz
+mv kawa-${KAWA_VERSION} kawa
 cd kawa
-./configure --with-android=$ANDROID_HOME/platforms/$ANDROID_PLATFORM/android.jar --disable-xquery --disable-jemacs
+echo "Building kawa"
+./configure --with-android=$1/platforms/$2/android.jar --disable-xquery --disable-jemacs
 # Because kawa docs sometimes fail to build.
 echo '' > doc/kawa.texi
 make

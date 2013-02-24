@@ -63,6 +63,7 @@ EOF
 (cd $2; patch < build.xml.patch)
 echo 'adb shell kill $(adb shell ps|grep -i kawa.android|awk  '"'"'{ print $2 }'"') > /dev/null" > $2/make-and-send
 echo "ant debug && adb install -r bin/$2-debug.apk && adb shell am start -a android.intent.action.MAIN kawa.android/.$3" >> $2/make-and-send
+chmod +x $2/make-and-send
 
 cat > $2/src/kawa/android/$3.scm <<EOF
 (require 'android-defs)
