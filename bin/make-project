@@ -1,11 +1,13 @@
 #!/bin/bash
 
+set -e
+
 EXPECTED_ARGS=3
 E_BADARGS=65
 
 if [ $# -lt $EXPECTED_ARGS ]
 then
-  echo "Usage: `basename $0` android-platform project-name activity"
+  echo "Usage: `basename $0` android-platform project-name activity package-name"
   echo "Setups a new Android project with Kawa."
   echo "	Kawa should exist in the kawa/ directory as set up by bin/setup-kawa"
   echo "	bin/make-project android-14 KawaHello2 hello"
@@ -22,12 +24,18 @@ if [ -d $2 ]; then
    exit 1;
 fi
 
-android create project --target $1 --name $2 --activity $3 --path $2 --package kawa.android
-rm -f $2/src/kawa/android/$3.jar
-touch $2/src/kawa/android/$3.scm
-ln -s `pwd`/kawa/kawa-1.*.jar $2/libs/kawa.jar
+PKG_PATH=$(echo $4 | sed -e "s:\.:/:g")
+TARGET=$1
+NAME=$2
+ACTIVITY=$3
+PKG=$4
 
-cat > $2/build.xml.patch <<EOF
+android create project --target ${TARGET} --name ${NAME} --activity ${ACTIVITY} --path ${NAME} --package ${PKG}
+rm -f ${NAME}/src/${PKG_PATH}/${ACTIVITY}.jar
+touch ${NAME}/src/${PKG_PATH}/${ACTIVITY}.scm
+ln -s `pwd`/kawa/kawa-1.*.jar ${NAME}/libs/kawa.jar
+
+cat > ${NAME}/build.xml.patch <<EOF
 --- build.xml.orig	2010-10-11 15:48:59.092681778 -0700
 +++ build.xml	2010-11-04 22:26:34.565673740 -0700
 @@ -64,4 +64,27 @@
@@ -47,9 +55,9 @@ cat > $2/build.xml.patch <<EOF
 +          <pathelement path="\${out.classes.absolute.dir}"/>
 +	</classpath>
 +       <arg value="-d"/> <arg path="\${out.classes.absolute.dir}"/>
-+       <arg line="-P kawa.android. --warn-undefined-variable --module-static-run --warn-invoke-unknown-method --warn-as-error"/>
++       <arg line="-P ${PKG}. --warn-undefined-variable --module-static-run --warn-invoke-unknown-method --warn-as-error"/>
 +       <arg value="-C"/>
-+       <arg file="src/kawa/android/$3.scm"/>
++       <arg file="src/${PKG_PATH}/${ACTIVITY}.scm"/>
 +<!--       <fileset dir=".">
 +         <include name="**/*.scm"/>
 +       </fileset>
@@ -60,17 +68,17 @@ cat > $2/build.xml.patch <<EOF
  </project>
 EOF
 
-(cd $2; patch < build.xml.patch)
-echo 'adb shell kill $(adb shell ps|grep -i kawa.android|awk  '"'"'{ print $2 }'"') > /dev/null" > $2/make-and-send
-echo "ant debug && adb install -r bin/$2-debug.apk && adb shell am start -a android.intent.action.MAIN kawa.android/.$3" >> $2/make-and-send
-chmod +x $2/make-and-send
+(cd ${NAME}; patch < build.xml.patch)
+echo "adb shell kill \$(adb shell ps|grep -i ${PKG}|awk  '{ print $2 }') > /dev/null" > ${NAME}/make-and-send
+echo "ant debug && adb install -r bin/${NAME}-debug.apk && adb shell am start -a android.intent.action.MAIN ${PKG}/.${ACTIVITY}" >> ${NAME}/make-and-send
+chmod +x ${NAME}/make-and-send
 
-cat > $2/src/kawa/android/$3.scm <<EOF
+cat > ${NAME}/src/${PKG_PATH}/${ACTIVITY}.scm <<EOF
 (require 'android-defs)
 
 (define-namespace Log "class:android.util.Log")
 
-(activity $3
+(activity ${ACTIVITY}
   (on-create-view
    (Log:i "kawa" "Just letting you know we're alive.")
    (android.widget.TextView
@@ -78,4 +86,4 @@ cat > $2/src/kawa/android/$3.scm <<EOF
     text: "Hello from Kawa Scheme!")))
 EOF
 
-echo "Done! Use \"cd $2 && ./make-and-send\" to see it action. Sources are in kawa/android/$3.scm"
+echo "Done! Use \"cd ${NAME} && ./make-and-send\" to see it action. Sources are in ${PKG_PATH}/${ACTIVITY}.scm"

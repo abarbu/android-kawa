@@ -41,11 +41,11 @@ bin/setup-kawa /opt/android-sdk-update-manager android-17
 ** Creating a new project
 To create a new project you can use
 #+BEGIN_SRC sh
-bin/make-project <android-platform> <project-name> <activity-name>
+bin/make-project <android-platform> <project-name> <activity-name> <package>
 #+END_SRC
 for example
 #+BEGIN_SRC sh
-bin/make-project android-17 HelloWorld hello
+bin/make-project android-17 HelloWorld hello kawa.example
 #+END_SRC
 The arguments are: the platform/api level, the project name and the
 original activity name. This calls 'android create project' and
@@ -53,9 +53,13 @@ patches the resulting build.xml file. It will create a trivial
 application that displays a message. Sources are in
 <project-name>/src/kawa/android/<activity>.scm. The resulting
 application will have package name kawa.android. You should probably
-change this, It's recorded in src/kawa/android/hello.java,
-AndroidManifest.xml, and build.xml. One day I'll have make-project do
-this automatically.
+change this, It's recorded in src/kawa/kawa/example.java,
+AndroidManifest.xml, and build.xml. The <package> name is how Android
+will internally refer to this application. So if you want to start it
+or for example uninstall it you would use the package name, for example
+#+BEGIN_SRC sh
+adb uninstall kawa.example
+#+END_SRC
 
 Before we can run anything you'll need to either connect a phone with
 developer mode enabled or set up an emulator. We can do the latter
