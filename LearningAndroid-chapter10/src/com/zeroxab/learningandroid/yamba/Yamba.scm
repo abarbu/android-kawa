@@ -11,7 +11,7 @@
   ((import-class fqcn)
    (let* ((cls :: java.lang.Class (eval (syntax fqcn)))
 	  (name (string->symbol (java.lang.Class:getSimpleName cls))))
-    #`(define-alias ,(datum->syntax-object form name) fqcn)))))
+    #`(define-alias #,(datum->syntax-object form name) fqcn)))))
 
 (define-alias Arrays  java.util.Arrays)
 (define-alias Math java.lang.Math)
@@ -40,15 +40,11 @@
 (define-alias KeyEvent			android.view.KeyEvent)
 (define-alias OnClickListener		android.view.View$OnClickListener)
 (define-alias SurfaceHolder		android.view.SurfaceHolder)
-(define-alias View			android.view.View)
 (define-alias Menu			android.view.Menu)
 (define-alias MenuItem			android.view.MenuItem)
 
-(define-alias Button			android.widget.Button)
-(define-alias EditText			android.widget.EditText)
 (define-alias ListView			android.widget.ListView)
 (define-alias SimpleCursorAdapter       android.widget.SimpleCursorAdapter)
-(define-alias TextView			android.widget.TextView)
 (define-alias Toast			android.widget.Toast)
 (define-alias ViewBinder                android.widget.SimpleCursorAdapter$ViewBinder)
 
@@ -112,7 +108,7 @@
 		 (process #`rest)))
 	  (() '())))))
      #`(object (android.os.AsyncTask)
-	       ,@(process #`r)))))))
+	       #,(process #`r)))))))
 
 (define-syntax simple-thread
  (lambda (x)
