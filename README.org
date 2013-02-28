@@ -1,23 +1,12 @@
-* Examples of using Kawa Scheme on Android
-
-- KawaHello is a simple hello world application
-- LunarLander is a reimplementation of the SDK example
-- LearningAndroid-chapter{6,7,8,9,10} are implementations of the main
-  projects for most of the chapters from Marko Garneta's "Learning
-  Android"
-
-These were written while I was figuring out if Kawa can be used for
-Android development and how to work out various Android&Kawa-specific
-quirks. All examples try to mostly stay true to their source however
-badly designed that source was. As such this isn't a good place to
-look for good Scheme style or idiomatic Kawa.
-
+* Kawa Scheme on Android
+This started as a collection of examples of Kawa on Android because I
+couldn't find anything substantive. It will slowly morph into a
+tutorial.
 ** Setting up
-
 We'll first need to get an Android SDK set up, skip this if you've
 already got one. You'll need to install the Android SDK; your
 distribution's package management software will help with this. Once
-you're done, run ''android'', select and install the latest API
+you're done, run /android/, select and install the latest API
 revision (17 as of this document).
 
 You will need Java 1.6, dex is unhappy with 1.7. Running
@@ -68,8 +57,8 @@ with
 android create avd -a -n Test -t 1 --abi armeabi-v7a
 #+END_SRC
 and just accept the defaults. If you've got a plain-vanilla SDK setup
-id 1 will be the basic android platform. You can check with ''android
-list targets'' and adjust accordingly. Once it's setup it, just run
+id 1 will be the basic android platform. You can check with /android
+list targets/ and adjust accordingly. Once it's setup it, just run
 #+BEGIN_SRC sh
 bin/start-emulator
 #+END_SRC
@@ -86,7 +75,64 @@ This will create an apk and send it out to either an emulator that
 we're already running or to a phone we've connected. When you modify
 the code just rerun make-and-send.
 
-** Setting up the examples
+*** Debugging
+
+While debugging I have 
+#+BEGIN_SRC sh
+bin/colorize-adb-logcat
+#+END_SRC
+running in a terminal to easily spot log messages. I haven't yet
+bothered figuring out how to set up a debugger.
+
+*** XML sanity
+
+I highly recommend editing your UIs and Manifest files in Eclipse with
+the Android plugins available from
+
+    https://dl-ssl.google.com/android/eclipse/
+
+Click /Help/, /Install New Software/, add the above repository,
+and install all of the software it provides. Once you've created a
+project with the /make-project/ script above import it into
+Eclipse. Click /New/, /Project/, choose /Android/, /Android
+Project from Existing Code/ and select the toplevel directory of the
+project. Eclipse will eventually complain that classes are missing
+because it doesn't know about our Scheme code but editing Manifests
+and resources with the Eclipse UI isn't too bad.
+
+Click /AndroidManifest.xml/, select /Application/ (bottom),
+/Theme/, /Browse/, and pick /Holo.Light.ButtonBar/ and
+save. Navigate to /res/, /layout/, /main.xml/ and there's the UI
+of the application we just made and it's now using the pretty Holo
+UI.
+
+The default application that make-project creates doesn't use the xml
+file at all, it creates its own TextView widget on the fly:
+#+BEGIN_SRC scheme
+  ((this):setContentView
+   (android.widget.TextView
+    (this)
+    text: "Hello from Kawa Scheme!"))
+#+END_SRC scheme
+Replace that code with
+#+BEGIN_SRC scheme
+((this):setContentView <package-name>.R$layout:main)
+#+END_SRC scheme
+Note the /R/ syntax for accessing resources.
+and you'll see the UI from Eclipse.
+** Examples 
+
+- KawaHello is a simple hello world application
+- LunarLander is a reimplementation of the SDK example
+- LearningAndroid-chapter{6,7,8,9,10} are implementations of the main
+  projects for most of the chapters from Marko Garneta's "Learning
+  Android"
+
+These were written while I was figuring out if Kawa can be used for
+Android development and how to work out various Android&Kawa-specific
+quirks. All examples try to mostly stay true to their source however
+badly designed that source was. As such this isn't a good place to
+look for good Scheme style or idiomatic Kawa.
 
 To get the examples to work you need to set them up
 #+BEGIN_SRC sh
@@ -103,14 +149,6 @@ signpost-core-1.2.1.1.jar from
 http://www.winterwell.com/software/jtwitter.php in each of their libs
 directory.
 
-** Misc
-
-While debugging I have 
-#+BEGIN_SRC sh
-bin/colorize-adb-logcat
-#+END_SRC
-running in a terminal to easily spot log messages.
-
 ** Troubleshooting
 *** bad magic bits with dex
 You've somehow managed to install with 1.7. Delete your old install
@@ -124,7 +162,7 @@ after running make-and-send, you've got a copy of apk you're trying to
 send to the phone already installed but it was compiled on a different
 machine with a different certificate. You just have to uninstall
 it. Keep in mind that if you've never changed the name of a project
-you've left the default (kxawa.android) in. You'll want to uninstall
+you've left the default (kawa.android) in. You'll want to uninstall
 the old package with
 #+BEGIN_SRC
 adb uninstall kawa.android
