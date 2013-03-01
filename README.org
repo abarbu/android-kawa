@@ -169,3 +169,19 @@ adb uninstall kawa.android
 #+END_SRC
 and read the section above on creating projects for how to change the
 internal project name.
+*** more than one possibly applicable method '<init>' in ...
+A common error with a pretty unhelpful error message. Usually happens
+in code that looks like:
+#+BEGIN_SRC
+(make <org.apache.http.client.methods.HttpGet> x)
+#+END_SRC
+Kawa is getting confused about the type of x, so you have to give it a
+hand by casting it explicitly.
+#+BEGIN_SRC
+(make <org.apache.http.client.methods.HttpGet> (as String x))
+#+END_SRC
+*** no known slot '...' in java.lang.Object
+As above, Kawa can't figure out the type of the object you're trying
+to use and at some point ended up casting it to Object. Likely you've
+got something like a function or let binding where you didn't specify
+a type. You can either do that or cast as in the above section.
