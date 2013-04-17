@@ -149,7 +149,7 @@ signpost-core-1.2.1.1.jar from
 http://www.winterwell.com/software/jtwitter.php in each of their libs
 directory.
 
-** Troubleshooting
+** Troubleshooting the build system
 *** bad magic bits with dex
 You've somehow managed to install with 1.7. Delete your old install
 entirely, downgrade to 1.6 and reinstall.
@@ -169,6 +169,11 @@ adb uninstall kawa.android
 #+END_SRC
 and read the section above on creating projects for how to change the
 internal project name.
+** Troubleshooting kawa
+By far the most difficult and frustrating part of writing code with
+Kawa for Android is going to be dealing with Kawa's extremely
+unhelpful error messages. I've listed some of the common ones and what
+they mean.
 *** more than one possibly applicable method '<init>' in ...
 A common error with a pretty unhelpful error message. Usually happens
 in code that looks like:
@@ -185,3 +190,11 @@ As above, Kawa can't figure out the type of the object you're trying
 to use and at some point ended up casting it to Object. Likely you've
 got something like a function or let binding where you didn't specify
 a type. You can either do that or cast as in the above section.
+
+This might also happen if you have a misspelled identifier. 
+*** no possibly applicable method '<init>/valueOf' in ...
+You've code like
+#+BEGIN_SRC
+(make <something> args ...)
+#+END_SRC
+and one of the arguments is of the wrong type.
