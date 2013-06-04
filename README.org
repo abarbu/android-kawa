@@ -169,6 +169,10 @@ adb uninstall kawa.android
 #+END_SRC
 and read the section above on creating projects for how to change the
 internal project name.
+*** unable to resolve project target 'android-number'
+You're compiling a project for an SDK version you don't actually have
+installed. The simplest solution is to just edit /project.properties/
+and change the SDK version.
 ** Troubleshooting kawa
 By far the most difficult and frustrating part of writing code with
 Kawa for Android is going to be dealing with Kawa's extremely
@@ -193,7 +197,7 @@ a type. You can either do that or cast as in the above section.
 
 This might also happen if you have a misspelled identifier. 
 *** no possibly applicable method '<init>/valueOf' in ...
-You've code like
+You've got code like
 #+BEGIN_SRC
 (make <something> args ...)
 #+END_SRC
