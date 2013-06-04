@@ -1,0 +1,2 @@
+adb shell kill $(adb shell ps|grep -i zeroxab.speedread|awk  '{ print SpeedRead }') > /dev/null
+ant debug && adb install -r bin/SpeedRead-debug.apk && adb shell am start -a android.intent.action.MAIN zeroxab.speedread/.speedread

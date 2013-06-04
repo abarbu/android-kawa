@@ -1,7 +1,11 @@
 * Kawa Scheme on Android
 This started as a collection of examples of Kawa on Android because I
 couldn't find anything substantive. It will slowly morph into a
-tutorial.
+tutorial. At the moment it consists of a number of examples ported
+from Java and an application written from scratch in Kawa,
+SpeedRead. If you're new, work your way up with the simpler examples
+first. If you want to dive right in, look at SpeedRead. It's much
+cleaner.
 ** Setting up
 We'll first need to get an Android SDK set up, skip this if you've
 already got one. You'll need to install the Android SDK; your
@@ -121,7 +125,7 @@ Replace that code with
 Note the /R/ syntax for accessing resources.
 and you'll see the UI from Eclipse.
 ** Examples 
-
+*** SDK/LearningAndroid
 - KawaHello is a simple hello world application
 - LunarLander is a reimplementation of the SDK example
 - LearningAndroid-chapter{6,7,8,9,10} are implementations of the main
@@ -148,7 +152,16 @@ LearningAndroid examples need to a copy of jtwitter.jar and
 signpost-core-1.2.1.1.jar from
 http://www.winterwell.com/software/jtwitter.php in each of their libs
 directory.
-
+*** SpeedRead
+SpeedRead is an app for rapid sequential visual presentation (RSVP) of
+text. It flashes text to allow you to read more quickly. This is a
+working application. With some love it will one day make its way into
+the app market. It was designed for the ground up as a Kawa
+application and has much nicer style than the other examples. It's
+also a much more complex application than the other examples while
+still being quite small. Note all of the macros which make unpleasant
+repetitive code much nicer. One day these and other code will make
+their way into a standard library for Android Kawa.
 ** Troubleshooting the build system
 *** bad magic bits with dex
 You've somehow managed to install with 1.7. Delete your old install

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/playerRoot" >
+
+    <TextView
+        android:id="@+id/leftArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:text="&lt;"
+        android:textSize="50pt"
+        android:textColor="#3399ff"
+        android:alpha="0.8" />
+
+    <TextView
+        android:id="@+id/rightArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:text="&gt;"
+        android:textSize="50pt"
+        android:textColor="#3399ff"
+        android:alpha="0.8" />
+    
+    <TextView
+        android:id="@+id/goText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="GO"
+        android:textSize="25pt"
+        android:textColor="#3399ff"
+        android:alpha="0.8" />
+    
+    <TextView
+        android:id="@+id/Overview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ViewerLocation"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/Location"
+        android:text="Text"
+        android:textSize="8pt" />
+
+    <TextView
+        android:id="@+id/Viewer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:text="@string/shown"
+        android:textSize="18pt" />
+
+    <SeekBar
+        android:id="@+id/ViewerLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/Location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/location" />
+
+</RelativeLayout>
