@@ -30,12 +30,12 @@ NAME=$2
 ACTIVITY=$3
 PKG=$4
 
-android create project --target ${TARGET} --name ${NAME} --activity ${ACTIVITY} --path ${NAME} --package ${PKG}
+android create project --target ${TARGET} --name ${NAME} --activity ${ACTIVITY} --path ${NAME} --package ${PKG} > /dev/null || (echo "Failed to create an android project! File a bug at github.com/abarbu/android-kawa" && exit 1)
 rm -f ${NAME}/src/${PKG_PATH}/${ACTIVITY}.jar
 touch ${NAME}/src/${PKG_PATH}/${ACTIVITY}.scm
 ln -s `pwd`/kawa/kawa-1.*.jar ${NAME}/libs/kawa.jar
 
-cat > ${NAME}/build.xml.patch <<EOF
+(cd ${NAME}; (patch -p0 <<\EOF
 --- build.xml.orig	2010-10-11 15:48:59.092681778 -0700
 +++ build.xml	2010-11-04 22:26:34.565673740 -0700
 @@ -64,4 +64,27 @@
@@ -67,8 +67,8 @@ cat > ${NAME}/build.xml.patch <<EOF
 +
  </project>
 EOF
-
-(cd ${NAME}; patch < build.xml.patch)
+) > /dev/null \
+  || (echo "Failed to patch the build file! File a bug at github.com/abarbu/android-kawa" && exit 1))
 echo "adb shell kill \$(adb shell ps|grep -i ${PKG}|awk  '{ print $2 }') > /dev/null" > ${NAME}/make-and-send
 echo "ant debug && adb install -r bin/${NAME}-debug.apk && adb shell am start -a android.intent.action.MAIN ${PKG}/.${ACTIVITY}" >> ${NAME}/make-and-send
 chmod +x ${NAME}/make-and-send

@@ -13,18 +13,12 @@ distribution's package management software will help with this. Once
 you're done, run /android/, select and install the latest API
 revision (17 as of this document).
 
-You will need Java 1.6, dex is unhappy with 1.7. Running
-#+BEGIN_SRC sh
-javac -version
-#+END_SRC
-should yield something that starts with 1.6, if not you're going to
-have to use your distribution's package manager to switch to Java 1.6.
-
 To get started with Scheme you'll need a custom build for Kawa, this
 will fetch and build the latest sources
 #+BEGIN_SRC sh
 bin/setup-kawa <android-home> <android-platform>
 #+END_SRC
+
 You'll need to point it to your android SDK directory and give it the
 platform number. On my machine this looks like:
 #+BEGIN_SRC sh
@@ -54,15 +48,29 @@ or for example uninstall it you would use the package name, for example
 adb uninstall kawa.example
 #+END_SRC
 
-Before we can run anything you'll need to either connect a phone with
-developer mode enabled or set up an emulator. We can do the latter
-with
+*** Running on the phone
+
+Building and running are both done by the same script.
+#+BEGIN_SRC sh
+cd SpeedRead && ./make-and-send
+#+END_SRC
+This will create an apk and send it out to the phone and run it. When
+you modify the code just rerun make-and-send. Your first compile will
+likely be slow but subsequent ones will be much faster. When you're
+done you can clean up with
+#+BEGIN_SRC sh
+adb uninstall zeroxab.speedread
+#+END_SRC
+
+*** Running in the emulator
+
+You first need to set up the emulator by running
 #+BEGIN_SRC sh
 android create avd -a -n Test -t 1 --abi armeabi-v7a
 #+END_SRC
-and just accept the defaults. If you've got a plain-vanilla SDK setup
-id 1 will be the basic android platform. You can check with /android
-list targets/ and adjust accordingly. Once it's setup it, just run
+and accepting the defaults. If you've got a plain-vanilla SDK setup id
+1 will be the basic android platform. You can check with /android list
+targets/ and adjust accordingly. Once it's setup it, just run
 #+BEGIN_SRC sh
 bin/start-emulator
 #+END_SRC
@@ -70,14 +78,8 @@ to fire it up, it'll take a while...  The emulator is so obscenely
 slow that you'll want to either run things on your phone or set up
 vmware.
 
-Once the emulator is up and running lets take our new project out for
-a spin
-#+BEGIN_SRC sh
-cd HelloWorld && ./make-and-send
-#+END_SRC
-This will create an apk and send it out to either an emulator that
-we're already running or to a phone we've connected. When you modify
-the code just rerun make-and-send.
+Running and building work the same way they do for the phone from the
+same /make-and-send/ script.
 
 *** Debugging
 
@@ -85,8 +87,7 @@ While debugging I have
 #+BEGIN_SRC sh
 bin/colorize-adb-logcat
 #+END_SRC
-running in a terminal to easily spot log messages. I haven't yet
-bothered figuring out how to set up a debugger.
+running in a terminal to easily spot log messages.
 
 *** XML sanity
 
@@ -138,15 +139,11 @@ quirks. All examples try to mostly stay true to their source however
 badly designed that source was. As such this isn't a good place to
 look for good Scheme style or idiomatic Kawa.
 
-To get the examples to work you need to set them up
-#+BEGIN_SRC sh
-bin/setup-examples
-#+END_SRC
+In general these are meant to be read, not necessarily run as such I
+don't always keep them up to date.
 
 You may need to update local.properties in each of the examples
 directory to change the path to the Android SDK.
-
-This has been tested with Android SDK r15 and r17.
 
 LearningAndroid examples need to a copy of jtwitter.jar and
 signpost-core-1.2.1.1.jar from
@@ -204,9 +201,11 @@ hand by casting it explicitly.
 #+END_SRC
 *** no known slot '...' in java.lang.Object
 As above, Kawa can't figure out the type of the object you're trying
-to use and at some point ended up casting it to Object. Likely you've
+to use and at some point ended up casting it to Object. Vou've
 got something like a function or let binding where you didn't specify
-a type. You can either do that or cast as in the above section.
+a type. You can either specify one or cast as in the above section.
+
+((lunarView:getThread):pause)
 
 This might also happen if you have a misspelled identifier. 
 *** no possibly applicable method '<init>/valueOf' in ...
@@ -215,3 +214,7 @@ You've got code like
 (make <something> args ...)
 #+END_SRC
 and one of the arguments is of the wrong type.
+*** Unfortunately, <application name> has stopped.
+Run 'adb logcat' or 'bin/colorize-adb-logcat' and have a look at the
+RuntimeException. Right now there's no interactive debugger but one is
+in the pipeline.

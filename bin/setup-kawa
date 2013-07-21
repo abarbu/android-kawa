@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 EXPECTED_ARGS=2
 E_BADARGS=65
@@ -10,14 +11,8 @@ KAWA_VERSION=1.13
 if [ $# -lt $EXPECTED_ARGS ]; then
     echo "Usage: `basename $0` android-home android-platform"
     echo "	Setup a Kawa install in the current directory for a particular Android version."
-    echo "	for example: bin/setup-kawa /opt/android-sdk-update-manager android-14"
+    echo "	for example: bin/setup-kawa /opt/android-sdk-update-manager android-17"
     exit $E_BADARGS
-fi
-
-if [[ -z $(javac -version 2>&1 | grep 1.6) ]]; then
-    echo "Your javac is not version 1.6.*"
-    echo "   dex can't process files from any other version, you'll need to downgrade"
-    exit
 fi
 
 echo "Fetching Kawa ${KAWA_VERSION}"
@@ -30,8 +25,40 @@ fi
 tar xvf kawa-1.13.tar.gz
 mv kawa-${KAWA_VERSION} kawa
 cd kawa
+echo "Patching kawa"
+patch -p0 <<\EOF
+--- Makefile.am.orig	2013-07-17 09:36:47.448268287 -0400
++++ Makefile.am	2012-11-22 02:11:40.000000000 -0500
+@@ -258,7 +258,7 @@
+ COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
+ 
+ gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
+-	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
++	$(JAVAC) -d . $(JAVACFLAGS) $(srcdir)/gnu/kawa/util/PreProcess.java
+ 
+ # JDK 1.1
+ select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+EOF
+patch -p0 <<\EOF
+--- Makefile.in.orig	2013-07-17 09:36:49.229268472 -0400
++++ Makefile.in	2012-12-09 02:29:46.000000000 -0500
+@@ -959,7 +959,7 @@
+ 	  | sed -e 's|./||' | sort > $@
+ 
+ gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
+-	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
++	$(JAVAC) -d . $(JAVACFLAGS) $(srcdir)/gnu/kawa/util/PreProcess.java
+ 
+ # JDK 1.1
+ select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+EOF
 echo "Building kawa"
-./configure --with-android=$1/platforms/$2/android.jar --disable-xquery --disable-jemacs
+JAVACFLAGS="-source 1.6 -target 1.6" ./configure --with-android=$1/platforms/$2/android.jar --disable-xquery --disable-jemacs || (echo "Failed to configure Kawa!"; exit 1)
 # Because kawa docs sometimes fail to build.
 echo '' > doc/kawa.texi
-make
+make || (echo "Failed to build Kawa!"; exit 1)
+cd ..
+rm kawa-1.13.tar.gz
+ln -s `pwd`/kawa/kawa-1.*.jar kawa/kawa.jar
+echo
+echo "Done! We're good to go"
