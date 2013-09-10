@@ -6,6 +6,7 @@ from Java and an application written from scratch in Kawa,
 SpeedRead. If you're new, work your way up with the simpler examples
 first. If you want to dive right in, look at SpeedRead. It's much
 cleaner.
+
 ** Setting up
 We'll first need to get an Android SDK set up, skip this if you've
 already got one. You'll need to install the Android SDK; your
