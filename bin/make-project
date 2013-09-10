@@ -35,7 +35,7 @@ rm -f ${NAME}/src/${PKG_PATH}/${ACTIVITY}.jar
 touch ${NAME}/src/${PKG_PATH}/${ACTIVITY}.scm
 ln -s `pwd`/kawa/kawa-1.*.jar ${NAME}/libs/kawa.jar
 
-(cd ${NAME}; (patch -p0 <<\EOF
+(cd ${NAME}; (patch -p0 <<EOF
 --- build.xml.orig	2010-10-11 15:48:59.092681778 -0700
 +++ build.xml	2010-11-04 22:26:34.565673740 -0700
 @@ -64,4 +64,27 @@
